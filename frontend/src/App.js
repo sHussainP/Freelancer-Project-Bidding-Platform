@@ -5,7 +5,7 @@ import Register from './components/Auth/Register';
 import Login from './components/Auth/Login';
 import PrivateRoute from './components/PrivateRoute';
 
-// Placeholder Components - We will build these later
+// Placeholder Components
 const Home = () => <div><h1>Welcome to the Freelancer Platform</h1><Link to="/login">Login</Link> | <Link to="/register">Register</Link></div>;
 const Register = () => <div><h2>Register</h2></div>;
 const Login = () => <div><h2>Login</h2></div>;
