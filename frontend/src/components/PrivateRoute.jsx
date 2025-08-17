@@ -1,8 +1,8 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
-import jwt_decode from 'jwt-decode'; 
+import jwt_decode from 'jwt-decode';
 
-const PrivateRoute = ({ children, role }) => {
+const PrivateRoute = ({ children, allowedRoles }) => {
     // 1. Get the token from local storage
     const token = localStorage.getItem('token');
 
