@@ -139,7 +139,7 @@ Freelancer-Project-Bidding-Platform
 
 2. Install dependencies:  
    ```bash
-   npm install-all
+   npm run install-all
    ```
 
 3. Start backend server & frontend concurrently:  
