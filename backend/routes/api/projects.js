@@ -32,6 +32,19 @@ router.post('/', auth, async (req, res) => {
     }
 });
 
+// @route   GET api/projects/client
+// @desc    Get all projects for the authenticated client
+// @access  Private (Client)
+router.get('/client', auth, async (req, res) => {
+    try {
+        const projects = await Project.find({ client: req.user.id }).sort({ date: -1 });
+        res.json(projects);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server Error');
+    }
+});
+
 // @route   GET api/projects
 // @desc    Get all available projects
 // @access  Public
