@@ -5,7 +5,7 @@ import Register from './components/Auth/Register';
 import Login from './components/Auth/Login';
 
 // Placeholder Components
-const Home = () => <div><h1>Welcome to the FreelancerYourProject</h1><Link to="/login">Login</Link> | <Link to="/register">Register</Link></div>;
+const Home = () => <div><h1>Welcome to FreelancerYourProject.com</h1><Link to="/login">Login</Link> | <Link to="/register">Register</Link></div>;
 //const Register = () => <div><h2>Register</h2></div>;
 //const Login = () => <div><h2>Login</h2></div>;
 const ClientDashboard = () => <div><h2>Client Dashboard</h2><p>Post and manage your projects here.</p></div>;
