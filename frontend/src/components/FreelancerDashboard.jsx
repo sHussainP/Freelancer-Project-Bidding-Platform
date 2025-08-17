@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import axiosInstance from '../axiosConfig';
 
 const FreelancerDashboard = () => {
     const [projects, setProjects] = useState([]);
@@ -9,7 +10,7 @@ const FreelancerDashboard = () => {
 
     const fetchProjects = async () => {
         try {
-            const res = await axios.get('http://localhost:5001/api/projects');
+            const res = await axiosInstance.get('/api/projects');
             setProjects(res.data);
             setLoading(false);
         } catch (err) {

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import axiosInstance from '../axiosConfig';
 
 const ClientDashboard = () => {
     const [projects, setProjects] = useState([]);
@@ -11,12 +12,9 @@ const ClientDashboard = () => {
     const fetchProjects = async () => {
         try {
             const token = localStorage.getItem('token');
-            const config = {
-                headers: {
-                    'x-auth-token': token
-                }
-            };
-            const res = await axios.get('http://localhost:5001/api/projects/client', config); // Endpoint
+            const res = await axiosInstance.get('/api/projects/client', {
+                headers: { 'x-auth-token': token }
+            });
             setProjects(res.data);
             setLoading(false);
         } catch (err) {
@@ -35,14 +33,9 @@ const ClientDashboard = () => {
         e.preventDefault();
         try {
             const token = localStorage.getItem('token');
-            const config = {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'x-auth-token': token
-                }
-            };
-            const body = JSON.stringify(formData);
-            await axios.post('http://localhost:5001/api/projects', body, config);
+            await axiosInstance.post('/api/projects', formData, {
+                headers: { 'x-auth-token': token }
+            });
             alert('Project posted successfully!');
             setFormData({ title: '', description: '', budget: '', deadline: '' }); // Clear form
             fetchProjects(); // Refresh projects list
