@@ -198,16 +198,17 @@ backend/
 
 ### Projects
 
-| Method   | Endpoint                          | Description                           |
-| -------- | --------------------------------- | ------------------------------------- | --- | ----- | --------------------------------------- | ------------------ |
-| `POST`   | `/api/v1/projects`                | Create new project (client)           |
-| `GET`    | `/api/v1/projects`                | List all public projects with filters |
-| `GET`    | `/api/v1/projects/{id}`           | Get project details                   |
-| `PUT`    | `/api/v1/projects/{id}`           | Update project (client)               |
-| `DELETE` | `/api/v1/projects/{id}`           | Delete project (client)               |
-| `POST`   | `/api/v1/projects/{id}/upload`    | Upload files to project               |
-| `GET`    | `/api/v1/projects/{id}/bids`      | List all bids for project             |
-| `POST`   | `/api/v1/projects/{id}/favorites` | Toggle favorite                       |     | `GET` | `/api/v1/projects/{id}/favorites/count` | Get favorite count |
+| Method   | Endpoint                                | Description                           |
+| -------- | --------------------------------------- | ------------------------------------- |
+| `POST`   | `/api/v1/projects`                      | Create new project (client)           |
+| `GET`    | `/api/v1/projects`                      | List all public projects with filters |
+| `GET`    | `/api/v1/projects/{id}`                 | Get project details                   |
+| `PUT`    | `/api/v1/projects/{id}`                 | Update project (client)               |
+| `DELETE` | `/api/v1/projects/{id}`                 | Delete project (client)               |
+| `POST`   | `/api/v1/projects/{id}/upload`          | Upload files to project               |
+| `GET`    | `/api/v1/projects/{id}/bids`            | List all bids for project             |
+| `POST`   | `/api/v1/projects/{id}/favorites`       | Toggle favorite                       |
+| `GET`    | `/api/v1/projects/{id}/favorites/count` | Get favorite count                    |
 
 ### Bids
 
