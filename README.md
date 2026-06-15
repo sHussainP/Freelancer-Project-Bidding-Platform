@@ -135,7 +135,7 @@ This is a comprehensive Freelancer Project Bidding Platform built with:
 
 ### Frontend Structure
 
-```
+```text
 freelancer-platform/
 ├── app/
 │   ├── (auth)/           # Authentication pages
@@ -156,7 +156,7 @@ freelancer-platform/
 
 ### Backend Structure
 
-```
+```text
 backend/
 ├── api/
 │   ├── v1/
