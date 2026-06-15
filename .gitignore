@@ -141,3 +141,31 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
+
+# Python / FastAPI backend
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+venv/
+.venv/
+env/
+ENV/
+*.egg-info/
+dist/
+build/
+
+# User uploads (server filesystem)
+backend/uploads/
+uploads/
+
+# OS and IDE configuration files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
