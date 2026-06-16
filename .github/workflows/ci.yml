@@ -12,6 +12,13 @@ jobs:
     name: Run Backend Test Suite
     runs-on: ubuntu-latest
 
+    # Define service containers to spin up alongside the runner environment
+    services:
+      mongodb:
+        image: mongo:6.0
+        ports:
+          - 27017:27017
+
     steps:
       # Step 1: Check out the repository code onto the runner
       - name: Checkout Code
@@ -32,6 +39,10 @@ jobs:
 
       # Step 4: Change directory into backend and execute pytest
       - name: Run Pytest Suite
+        env:
+          # Tell FastAPI to connect to the runner's self-contained MongoDB service
+          MONGODB_URL: mongodb://localhost:27017
+          DATABASE_NAME: test_freelancer_db
         run: |
           cd backend
           pytest
