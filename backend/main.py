@@ -3,14 +3,21 @@ from fastapi import FastAPI
 from motor.motor_asyncio import AsyncIOMotorClient
 from config import settings
 from database import db_instance
+import logging
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup Engine: Connect to MongoDB
-    db_instance.client = AsyncIOMotorClient(settings.MONGODB_URL)
-    db_instance.db = db_instance.client[settings.DATABASE_NAME]
-    print(f"Connected securely to MongoDB database: {settings.DATABASE_NAME}")
+    try:
+        db_instance.client = AsyncIOMotorClient(settings.MONGODB_URL)
+        db_instance.db = db_instance.client[settings.DATABASE_NAME]
+        # Verify connection with a ping
+        await db_instance.db.command("ping")
+        print(f"Connected to MongoDB database: {settings.DATABASE_NAME}")
+    except Exception as e:
+        print(f"Failed to connect to MongoDB: {e}")
+        raise
 
     yield
 
@@ -20,6 +27,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="Freelancer Project Bidding Platform API", lifespan=lifespan)
+logger = logging.getLogger(__name__)
 
 
 @app.get("/api/v1/health")
@@ -28,7 +36,8 @@ async def health_check():
     try:
         await db_instance.db.command("ping")
         db_status = "connected"
-    except Exception:
+    except Exception as e:
+        logger.warning(f"Database health check failed: {e}")
         db_status = "disconnected"
 
     return {"status": "healthy", "database": db_status}
