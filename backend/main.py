@@ -10,7 +10,11 @@ import logging
 async def lifespan(app: FastAPI):
     # Startup Engine: Connect to MongoDB
     try:
-        db_instance.client = AsyncIOMotorClient(settings.MONGODB_URL)
+        db_instance.client = AsyncIOMotorClient(
+            settings.MONGODB_URL,
+            serverSelectionTimeoutMS=2000,
+            connectTimeoutMS=2000,
+        )
         db_instance.db = db_instance.client[settings.DATABASE_NAME]
         # Verify connection with a ping
         await db_instance.db.command("ping")
@@ -33,6 +37,8 @@ logger = logging.getLogger(__name__)
 @app.get("/api/v1/health")
 async def health_check():
     # Let's ping the database to verify it's active
+    if db_instance.db is None:
+        return {"status": "healthy", "database": "disconnected"}
     try:
         await db_instance.db.command("ping")
         db_status = "connected"
