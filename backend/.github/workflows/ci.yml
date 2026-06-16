@@ -21,7 +21,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-python: "3.11"
+          python-version: "3.11"
           cache: "pip" # Automatically caches dependencies for faster subsequent runs
 
       # Step 3: Install all required backend packages
