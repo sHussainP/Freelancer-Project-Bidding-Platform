@@ -4,6 +4,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from config import settings
 from database import db_instance
 from schemas.user import UserSignUp, UserLogin, Token, UserRole
+from pymongo.errors import DuplicateKeyError
 import authMiddleware
 import logging
 
@@ -20,6 +21,8 @@ async def lifespan(app: FastAPI):
         db_instance.db = db_instance.client[settings.DATABASE_NAME]
         # Verify connection with a ping
         await db_instance.db.command("ping")
+        # Ensure unique constraint on email
+        await db_instance.db["users"].create_index("email", unique=True)
         print(f"Connected to MongoDB database: {settings.DATABASE_NAME}")
     except Exception as e:
         print(f"Failed to connect to MongoDB: {e}")
@@ -56,11 +59,6 @@ async def health_check():
 
 @app.post("/api/v1/auth/signup", status_code=status.HTTP_201_CREATED)
 async def signup(user_data: UserSignUp):
-    # Check if user exists
-    existing_user = await db_instance.db["users"].find_one({"email": user_data.email})
-    if existing_user:
-        raise HTTPException(status_code=400, detail="Email already registered")
-
     hashed_password = authMiddleware.get_password_hash(user_data.password)
 
     new_user = {
@@ -70,7 +68,10 @@ async def signup(user_data: UserSignUp):
         "role": user_data.role.value,
     }
 
-    await db_instance.db["users"].insert_one(new_user)
+    try:
+        await db_instance.db["users"].insert_one(new_user)
+    except DuplicateKeyError:
+        raise HTTPException(status_code=400, detail="Email already registered")
     return {"message": "User registered successfully"}
 
 
