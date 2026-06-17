@@ -1,5 +1,6 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordRequestForm
 from motor.motor_asyncio import AsyncIOMotorClient
 from config import settings
 from database import db_instance
@@ -59,11 +60,12 @@ async def health_check():
 
 @app.post("/api/v1/auth/signup", status_code=status.HTTP_201_CREATED)
 async def signup(user_data: UserSignUp):
+    normalized_email = str(user_data.email).strip().lower()
     hashed_password = authMiddleware.get_password_hash(user_data.password)
 
     new_user = {
         "name": user_data.name,
-        "email": user_data.email,
+        "email": normalized_email,
         "password": hashed_password,
         "role": user_data.role.value,
     }
@@ -76,10 +78,11 @@ async def signup(user_data: UserSignUp):
 
 
 @app.post("/api/v1/auth/login", response_model=Token)
-async def login(credentials: UserLogin):
-    user = await db_instance.db["users"].find_one({"email": credentials.email})
+async def login(form_data: OAuth2PasswordRequestForm = Depends()):
+    normalized_email = form_data.username.strip().lower()
+    user = await db_instance.db["users"].find_one({"email": normalized_email})
     if not user or not authMiddleware.verify_password(
-        credentials.password, user["password"]
+        form_data.password, user["password"]
     ):
         raise HTTPException(status_code=400, detail="Incorrect email or password")
 

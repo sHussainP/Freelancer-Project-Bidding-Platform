@@ -56,6 +56,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme)) -> dict:
 
     # Convert MongoDB _id to string string conversion safely
     user["_id"] = str(user["_id"])
+    user.pop("password", None)
     return user
 
 
