@@ -1,8 +1,12 @@
 from contextlib import asynccontextmanager
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordRequestForm
 from motor.motor_asyncio import AsyncIOMotorClient
 from config import settings
 from database import db_instance
+from schemas.user import UserSignUp, UserLogin, Token, UserRole
+from pymongo.errors import DuplicateKeyError
+import authMiddleware
 import logging
 
 
@@ -18,6 +22,8 @@ async def lifespan(app: FastAPI):
         db_instance.db = db_instance.client[settings.DATABASE_NAME]
         # Verify connection with a ping
         await db_instance.db.command("ping")
+        # Ensure unique constraint on email
+        await db_instance.db["users"].create_index("email", unique=True)
         print(f"Connected to MongoDB database: {settings.DATABASE_NAME}")
     except Exception as e:
         print(f"Failed to connect to MongoDB: {e}")
@@ -47,3 +53,59 @@ async def health_check():
         db_status = "disconnected"
 
     return {"status": "healthy", "database": db_status}
+
+
+# --- AUTH ROUTERS ---
+
+
+@app.post("/api/v1/auth/signup", status_code=status.HTTP_201_CREATED)
+async def signup(user_data: UserSignUp):
+    normalized_email = str(user_data.email).strip().lower()
+    hashed_password = authMiddleware.get_password_hash(user_data.password)
+
+    new_user = {
+        "name": user_data.name,
+        "email": normalized_email,
+        "password": hashed_password,
+        "role": user_data.role.value,
+    }
+
+    try:
+        await db_instance.db["users"].insert_one(new_user)
+    except DuplicateKeyError:
+        raise HTTPException(status_code=400, detail="Email already registered")
+    return {"message": "User registered successfully"}
+
+
+@app.post("/api/v1/auth/login", response_model=Token)
+async def login(form_data: OAuth2PasswordRequestForm = Depends()):
+    normalized_email = form_data.username.strip().lower()
+    user = await db_instance.db["users"].find_one({"email": normalized_email})
+    if not user or not authMiddleware.verify_password(
+        form_data.password, user["password"]
+    ):
+        raise HTTPException(status_code=400, detail="Incorrect email or password")
+
+    access_token = authMiddleware.create_access_token(
+        data={"sub": user["email"], "role": user["role"]}
+    )
+    return {"access_token": access_token, "token_type": "bearer"}
+
+
+# --- RBAC PROTECTED TESTING PATHS ---
+
+
+@app.get("/api/v1/client/dashboard")
+async def client_dashboard(current_user: dict = Depends(authMiddleware.require_client)):
+    return {
+        "message": f"Welcome Client {current_user['name']}! You can post projects here."
+    }
+
+
+@app.get("/api/v1/freelancer/dashboard")
+async def freelancer_dashboard(
+    current_user: dict = Depends(authMiddleware.require_freelancer),
+):
+    return {
+        "message": f"Welcome Freelancer {current_user['name']}! You can place bids here."
+    }
