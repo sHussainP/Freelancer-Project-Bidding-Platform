@@ -9,7 +9,9 @@ load_dotenv()
 class Settings(BaseSettings):
     MONGODB_URL: str = "mongodb://localhost:27017"
     DATABASE_NAME: str = "freelancer_platform"
-    JWT_SECRET: str = "default_fallback_secret_key"
+    JWT_SECRET: str = (
+        "default_fallback_secret_key"  # TODO: In Production this key should be removed; making it's presence in .env mandatory;
+    )
     JWT_ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 1440
 
