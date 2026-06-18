@@ -2,17 +2,28 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { getUserRoleFromStorage } from "@/lib/utils";
 
 export default function ClientDashboard() {
   const router = useRouter();
 
   useEffect(() => {
-    const token = localStorage.getItem("access_token");
-    if (!token) {
+    const userRole = getUserRoleFromStorage();
+
+    if (!userRole) {
+      localStorage.removeItem("access_token");
       router.replace("/login");
       return;
     }
-    // Also verify token payload role === "CLIENT" before rendering.
+
+    if (userRole !== "CLIENT") {
+      if (userRole === "FREELANCER") {
+        router.replace("/freelancer");
+      } else {
+        localStorage.removeItem("access_token");
+        router.replace("/login");
+      }
+    }
   }, [router]);
 
   const handleLogout = () => {

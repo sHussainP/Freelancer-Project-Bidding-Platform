@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { api } from "@/lib/axios";
+import { decodeJwt } from "@/lib/utils";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -38,17 +39,10 @@ export default function LoginPage() {
         },
       });
 
-      // Save token directly to local storage context
       const { access_token } = response.data;
-      const payloadSegment = access_token?.split(".")?.[1];
-      if (!payloadSegment) throw new Error("Invalid access token format.");
 
-      const base64 = payloadSegment.replace(/-/g, "+").replace(/_/g, "/");
-      const padded = base64.padEnd(
-        base64.length + ((4 - (base64.length % 4)) % 4),
-        "=",
-      );
-      const tokenPayload = JSON.parse(atob(padded));
+      // Utilize our central utility layer
+      const tokenPayload = decodeJwt(access_token);
       const userRole = tokenPayload?.role;
 
       if (userRole !== "CLIENT" && userRole !== "FREELANCER") {
@@ -65,7 +59,9 @@ export default function LoginPage() {
       }
     } catch (err: any) {
       setError(
-        err.response?.data?.detail || "Authentication validation mismatch.",
+        err.response?.data?.detail ||
+          err.message ||
+          "Authentication validation mismatch.",
       );
     } finally {
       setLoading(false);
