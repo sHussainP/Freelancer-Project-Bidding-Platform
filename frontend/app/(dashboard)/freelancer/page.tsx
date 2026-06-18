@@ -1,13 +1,34 @@
 "use client";
 
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { getUserRoleFromStorage } from "@/lib/utils";
 
 export default function FreelancerDashboard() {
   const router = useRouter();
 
+  useEffect(() => {
+    const userRole = getUserRoleFromStorage();
+
+    if (!userRole) {
+      localStorage.removeItem("access_token");
+      router.replace("/login");
+      return;
+    }
+
+    if (userRole !== "FREELANCER") {
+      if (userRole === "CLIENT") {
+        router.replace("/client");
+      } else {
+        localStorage.removeItem("access_token");
+        router.replace("/login");
+      }
+    }
+  }, [router]);
+
   const handleLogout = () => {
     localStorage.removeItem("access_token");
-    router.push("/login");
+    router.replace("/login");
   };
 
   return (
