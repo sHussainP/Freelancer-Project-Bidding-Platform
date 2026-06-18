@@ -59,8 +59,8 @@ export default function LoginPage() {
       }
     } catch (err: any) {
       setError(
-        err.message ||
-          err.response?.data?.detail ||
+        err.response?.data?.detail ||
+          err.message ||
           "Authentication validation mismatch.",
       );
     } finally {
