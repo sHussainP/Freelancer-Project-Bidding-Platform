@@ -1,13 +1,23 @@
 "use client";
 
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 export default function ClientDashboard() {
   const router = useRouter();
 
+  useEffect(() => {
+    const token = localStorage.getItem("access_token");
+    if (!token) {
+      router.replace("/login");
+      return;
+    }
+    // Also verify token payload role === "CLIENT" before rendering.
+  }, [router]);
+
   const handleLogout = () => {
     localStorage.removeItem("access_token");
-    router.push("/login");
+    router.replace("/login");
   };
 
   return (

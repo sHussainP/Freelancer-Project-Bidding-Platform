@@ -28,7 +28,7 @@ export default function SignUpPage() {
     } catch (err: any) {
       setError(
         err.response?.data?.detail ||
-          "An absolute mismatch occurred during sign up.",
+          "Sign up failed. Please verify your details and try again.",
       );
     } finally {
       setLoading(false);

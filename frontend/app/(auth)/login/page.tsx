@@ -40,11 +40,22 @@ export default function LoginPage() {
 
       // Save token directly to local storage context
       const { access_token } = response.data;
-      localStorage.setItem("access_token", access_token);
+      const payloadSegment = access_token?.split(".")?.[1];
+      if (!payloadSegment) throw new Error("Invalid access token format.");
 
-      // Simple payload extraction engine to identify the role
-      const tokenPayload = JSON.parse(atob(access_token.split(".")[1]));
-      const userRole = tokenPayload.role;
+      const base64 = payloadSegment.replace(/-/g, "+").replace(/_/g, "/");
+      const padded = base64.padEnd(
+        base64.length + ((4 - (base64.length % 4)) % 4),
+        "=",
+      );
+      const tokenPayload = JSON.parse(atob(padded));
+      const userRole = tokenPayload?.role;
+
+      if (userRole !== "CLIENT" && userRole !== "FREELANCER") {
+        throw new Error("Unsupported role in token.");
+      }
+
+      localStorage.setItem("access_token", access_token);
 
       // Navigate accurately based on user role assignments
       if (userRole === "CLIENT") {
