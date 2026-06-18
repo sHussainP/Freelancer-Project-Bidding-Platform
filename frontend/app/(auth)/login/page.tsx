@@ -48,9 +48,9 @@ export default function LoginPage() {
 
       // Navigate accurately based on user role assignments
       if (userRole === "CLIENT") {
-        router.push("/dashboard/client");
+        router.push("/client");
       } else if (userRole === "FREELANCER") {
-        router.push("/dashboard/freelancer");
+        router.push("/freelancer");
       }
     } catch (err: any) {
       setError(
